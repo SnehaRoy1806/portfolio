@@ -156,7 +156,7 @@ function App() {
           </div>
           
           {/* Text Block - Added flex-1 to take remaining space naturally */}
-          <div className="text-center md:text-left flex-1">
+          <div className="text-left flex-1">
             <h2 className="text-4xl font-bold mb-4">Hello...👋</h2>
             <p className="leading-relaxed text-lg opacity-80 md:w-3/4 w-auto">
               I'm a curious coding enthusiast who can spend the entire day battling a problem. 
