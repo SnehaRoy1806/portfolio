@@ -7,7 +7,7 @@ import ProjectCard from './project-card';
 const API_URL = "https://script.google.com/macros/s/AKfycbwB69Xkl_s0IDW516561HFx88oQ7CKcQu8R3P6Nf6fphmmWpB75i0JiaJxMKc3Gwq-P/exec"; 
 
 function App() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState([]);
   const [experience, setExperience] = useState([]);
   const [work, setWork] = useState([]);
   
@@ -37,9 +37,9 @@ function App() {
         return res.json();
       })
       .then(data => {
-        setProfile(data.profile);
-        setExperience(data.experience);
-        setWork(data.work);
+        setProfile(data.profile || {});
+        setExperience(data.experience || []);
+        setWork(data.work || []);
       })
       .catch(err => {
         console.error("Error fetching data:", err);
@@ -50,10 +50,8 @@ function App() {
       });
   }, []);
 
-  // Loading State
+  // Loading State (with Coffee background for light mode)
   if (loading) return (
-    // Added dark mode classes here too so the loader respects the default theme
-    // UPDATED: Light mode background changed from bg-white to bg-[#faf7f5] (subtle warm beige)
     <div className="h-screen flex flex-col items-center justify-center bg-[#faf7f5] dark:bg-gray-900 text-gray-900 dark:text-white">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
       <p className="animate-pulse">Loading Portfolio...</p>
@@ -65,56 +63,64 @@ function App() {
     <div className="h-screen flex flex-col items-center justify-center bg-red-50 text-red-600 px-4 text-center">
       <h2 className="text-2xl font-bold mb-2">Oops! Something went wrong.</h2>
       <p>{error}</p>
-      <p className="text-sm mt-4 text-gray-600">
-        Tip: Open your browser console (F12) to see the specific error.
-      </p>
     </div>
   );
 
   return (
-    // UPDATED: Light mode background changed from bg-white to bg-[#faf7f5]
+    // Main Container: Coffee background (#faf7f5) for Light Mode, Dark Gray for Dark Mode
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#e7e5e4] text-gray-900'}`}>
       
       <div className="max-w-6xl mx-auto px-6 py-12">
         
-        {/* HEADER */}
+        {/* --- HEADER --- */}
         <header className="flex justify-between items-center mb-20">
           <h1 className="text-3xl font-bold">{profile?.name || "Sneha"}</h1>
           <div className="flex items-center gap-4">
-            <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            
+            {/* UPDATED: Resume Button linking to local public file */}
+            {/* import.meta.env.BASE_URL ensures it works on GitHub Pages subfolder */}
+            <a 
+              href={`${import.meta.env.BASE_URL}resume.pdf`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              download="Sneha_Resume.pdf" 
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition text-center"
+            >
               Download resume
-            </button>
+            </a>
+
             <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-900 text-white dark:bg-white dark:text-gray-900">
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           </div>
         </header>
 
-        {/* HERO */}
+        {/* --- HERO --- */}
         <section className="flex flex-col md:flex-row items-center gap-20 mb-20">
           <div className="w-64 h-64 bg-gray-200 dark:bg-gray-800 rounded-2xl flex-shrink-0 overflow-hidden">
              <img 
                src={profile?.image || "https://via.placeholder.com/300"} 
                alt="Profile" 
                className="w-full h-full object-cover" 
+               referrerPolicy="no-referrer"
              />
           </div>
           
           <div className="text-left">
-            <h2 className="text-4xl font-bold mb-4">About</h2>
-            <p className="leading-relaxed text-lg opacity-80 w-3/4">
+            <h2 className="text-4xl font-bold mb-4">Hello...👋</h2>
+            <p className="leading-relaxed text-lg opacity-80 md:w-3/4 w-auto">
               {profile?.about || "Loading bio..."}
             </p>
           </div>
         </section>
 
-        {/* EXPERIENCE */}
+        {/* --- EXPERIENCE --- */}
         <section className="mb-20">
           <h2 className="text-3xl font-bold mb-10">Experience</h2>
           <Experience data={experience} />
         </section>
 
-        {/* WORK */}
+        {/* --- WORK --- */}
         <section className="mb-20">
           <h2 className="text-3xl font-bold mb-8">Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
@@ -130,25 +136,47 @@ function App() {
           </div>
         </section>
 
-        {/* FOOTER */}
-        <footer className="flex flex-col md:flex-row items-center gap-8 pt-10 border-t border-gray-200 dark:border-gray-800">
-          <div className="w-24 h-24 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-             <img src={profile?.image} referrerPolicy="no-referrer" alt="Footer Profile" className="w-full h-full object-cover opacity-50" />
+        {/* --- UPDATED FOOTER --- */}
+        <footer className="flex flex-col items-center gap-6 pt-10 border-t border-gray-200 dark:border-gray-800">
+          
+          {/* 1. Centered Image */}
+          <div className="w-24 h-24 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden shadow-lg">
+             <img 
+               src={profile?.image} 
+               alt="Footer Profile" 
+               className="w-full h-full object-cover opacity-90" 
+               referrerPolicy="no-referrer"
+             />
           </div>
-          <div className="space-y-3">
-            <a href="mailto:sneha@example.com" className="flex items-center gap-3 hover:text-blue-600 transition">
-              <Mail size={20} />
-              <span>sneha@example.com</span>
+
+          {/* 2. Centered Row Links with Pipes */}
+          <div className="flex flex-wrap justify-center items-center gap-4 w-full">
+            
+            {/* Link 1: Email */}
+            <a href="mailto:sneha@example.com" className="flex items-center gap-2 hover:text-blue-600 transition group">
+              <Mail size={18} className="group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium">sneharoy1806@gmail.com</span>
             </a>
-            <a href="#" className="flex items-center gap-3 hover:text-blue-600 transition">
-              <Linkedin size={20} />
-              <span>sneha</span>
+            
+            {/* Separator */}
+            <span className="text-gray-300 dark:text-gray-700">|</span>
+
+            {/* Link 2: LinkedIn */}
+            <a href="https://www.linkedin.com/in/sneha-roy-1806sp19/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition group">
+              <Linkedin size={18} className="group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium">LinkedIn</span>
             </a>
-            <a href="#" className="flex items-center gap-3 hover:text-blue-600 transition">
-              <Github size={20} />
-              <span>sneha</span>
+
+            {/* Separator */}
+            <span className="text-gray-300 dark:text-gray-700">|</span>
+
+            {/* Link 3: GitHub */}
+            <a href="https://github.com/SnehaRoy1806" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition group">
+              <Github size={18} className="group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium">GitHub</span>
             </a>
           </div>
+          <div class="footer-note opacity-60">Designed &amp; Developed by me ❤️️</div>
         </footer>
 
       </div>
