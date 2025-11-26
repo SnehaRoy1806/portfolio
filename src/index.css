@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+/* --- PROGRESS BAR ANIMATION --- */
+.progress-fill {
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* Glowing leading edge */
+}
